@@ -67,8 +67,6 @@ func main() {
 
 	// start new goroutine to handle Stdin
 	go func() {
-		f, _ := os.Create("/home/thomas/barresult")
-		f.WriteString("...\n")
 		for {
 			bio := bufio.NewReader(os.Stdin)
 			line, _, _ := bio.ReadLine()
@@ -79,18 +77,10 @@ func main() {
 				line = line[1:]
 			}
 
-			err := json.Unmarshal(line, &m)
-			if err != nil {
-				f.WriteString(err.Error())
-			} else {
-				if r, ok := config.Data["onclick_"+m.Name]; ok {
-					split := strings.Split(r, " ")
-					err := exec.Command(split[0], split[1:]...).Start()
-					if err != nil {
-						f.WriteString(err.Error())
-					}
-				}
-
+			json.Unmarshal(line, &m)
+			if r, ok := config.Data["onclick_"+m.Name]; ok {
+				split := strings.Split(r, " ")
+				exec.Command(split[0], split[1:]...).Start()
 			}
 
 			time.Sleep(1)
